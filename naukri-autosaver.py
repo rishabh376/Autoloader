@@ -28,6 +28,17 @@ if not EMAIL or not PASSWORD:
 
 PROFILE_URL = "https://www.naukri.com/mnjuser/profile"
 
+RUN_DURATION = os.getenv("RUN_DURATION", "").strip()
+if RUN_DURATION:
+    try:
+        RUN_DURATION = int(RUN_DURATION)
+        if RUN_DURATION <= 0:
+            raise ValueError
+    except ValueError:
+        raise ValueError("RUN_DURATION must be a positive integer number of minutes.")
+else:
+    RUN_DURATION = 0
+
 # Fast Interval: 10 seconds (Matches manual speed)
 INTERVAL = 10
 
@@ -50,7 +61,9 @@ def get_driver():
     # options.add_argument("--headless") # Uncomment later to run in background
     
     try:
-        driver = uc.Chrome(options=options)
+        # Force a ChromeDriver major version matching the installed Chrome browser.
+        # Current browser is Chrome 148, so use version_main=148.
+        driver = uc.Chrome(options=options, version_main=148)
         driver.maximize_window()
         return driver
     except Exception as e:
@@ -149,35 +162,44 @@ def click_key_skills_and_save(driver):
 
 def main():
     failures = 0
+    start_time = time.time()
+    driver = None
     while True:
-        driver = None
+        if RUN_DURATION and time.time() - start_time >= RUN_DURATION * 60:
+            logging.info(f"Run duration reached ({RUN_DURATION} minutes). Exiting cleanly.")
+            return
+
         try:
             driver = get_driver()
             login(driver)
-            
+
             logging.info("Starting continuous Key Skills auto-save loop...")
-            
+
             while True:
+                if RUN_DURATION and time.time() - start_time >= RUN_DURATION * 60:
+                    logging.info(f"Run duration reached ({RUN_DURATION} minutes). Exiting cleanly.")
+                    return
+
                 try:
                     click_key_skills_and_save(driver)
                     failures = 0  # reset on success
-                    
+
                     # Random delay to look more human + respect server limits
                     delay = INTERVAL + random.uniform(10, 60)
                     logging.info(f"Waiting for {int(delay)} seconds before next update...")
                     time.sleep(delay)
-                    
+
                 except Exception as e:
                     failures += 1
                     logging.warning(f"Action failed ({failures}/{MAX_FAILURES}): {e}")
                     if failures >= MAX_FAILURES:
                         raise
                     time.sleep(2)
-                    
+
         except KeyboardInterrupt:
             logging.info("Script stopped by user.")
             break
-            
+
         except Exception as e:
             logging.error(f"Critical error: {e}")
             if driver:
@@ -186,13 +208,14 @@ def main():
                 except:
                     pass
             time.sleep(10)  # Wait before full restart
-            
+
         finally:
             if driver:
                 try:
                     driver.quit()
                 except:
                     pass
+            driver = None
 
 
 if __name__ == "__main__":
