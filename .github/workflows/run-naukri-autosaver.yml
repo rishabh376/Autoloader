@@ -25,6 +25,7 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -40,13 +41,13 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run naukri-autosaver
+        timeout-minutes: 90
         env:
           RUN_DURATION: ${{ github.event.inputs.run_duration_minutes || '90' }}
           NAUKRI_EMAIL: ${{ secrets.NAUKRI_EMAIL }}
           NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
         run: |
           # optionally create a .env file for the script without printing secrets
-          printf 'NAUKRI_EMAIL="%s"\nNAUKRI_PASSWORD="%s"\n' "${{ secrets.NAUKRI_EMAIL }}" "${{ secrets.NAUKRI_PASSWORD }}" > .env
-          python naukri-autosaver.py
+          printf 'NAUKRI_EMAIL="%s"\nNAUKRI_PASSWORD="%s"\nRUN_DURATION="%s"\n' "${{ secrets.NAUKRI_EMAIL }}" "${{ secrets.NAUKRI_PASSWORD }}" "$RUN_DURATION" > .env
           echo "Run duration: $RUN_DURATION minutes"
           python naukri-autosaver.py
