@@ -2,9 +2,9 @@ name: Run naukri-autosaver
 
 on:
   push:
-    branches: [ main, 'feature/**' ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, 'feature/**' ]
+    branches: [ main ]
   workflow_dispatch:
     inputs:
       run_duration_minutes:
