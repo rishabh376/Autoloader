@@ -16,11 +16,11 @@ on:
     # Morning 09:00 IST -> 03:30 UTC
     - cron: '30 3 * * *'
     # Noon 11:15 IST -> 05:45 UTC
-    - cron: '45 5 * * *'
+    - cron: '45 2 * * *'
     # Afternoon 15:00 IST -> 09:30 UTC
-    - cron: '30 9 * * *'
+    - cron: '30 3 * * *'
     # Evening 18:00 IST -> 12:30 UTC
-    - cron: '30 12 * * *'
+    - cron: '30 3 * * *'
 
 jobs:
   run:

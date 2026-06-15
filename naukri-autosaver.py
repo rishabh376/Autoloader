@@ -40,7 +40,7 @@ else:
     RUN_DURATION = 0
 
 # Fast Interval: 10 seconds (Matches manual speed)
-INTERVAL = 10
+INTERVAL = 1
 
 # Maximum consecutive failures before full restart
 MAX_FAILURES = 5
@@ -185,7 +185,7 @@ def main():
                     failures = 0  # reset on success
 
                     # Random delay to look more human + respect server limits
-                    delay = INTERVAL + random.uniform(10, 60)
+                    delay = INTERVAL + random.uniform(1, 2)
                     logging.info(f"Waiting for {int(delay)} seconds before next update...")
                     time.sleep(delay)
 
