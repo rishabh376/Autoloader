@@ -11,7 +11,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import undetected_chromedriver as uc
+from undetected_chromedriver import Chrome
 
 try:
     from dotenv import load_dotenv
@@ -58,12 +58,13 @@ logging.basicConfig(
 def get_driver():
     logging.info("Starting browser (undetected-mode)...")
     options = uc.ChromeOptions()
-    # options.add_argument("--headless") # Uncomment later to run in background
+    options.add_argument("--headless")
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
     
     try:
-        # Force a ChromeDriver major version matching the installed Chrome browser.
-        # Current browser is Chrome 148, so use version_main=148.
-        driver = uc.Chrome(options=options, version_main=148)
+        driver = Chrome(options=options, version_main=None)
         driver.maximize_window()
         return driver
     except Exception as e:
