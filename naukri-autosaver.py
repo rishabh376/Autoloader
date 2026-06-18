@@ -5,6 +5,7 @@ import time
 import random
 import logging
 from datetime import datetime
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -64,6 +65,7 @@ def get_driver():
     options.add_argument('--disable-gpu')
     
     try:
+        driver = webdriver.Chrome(ChromeDriverManager().install())
         driver = Chrome(options=options, version_main=None)
         driver.maximize_window()
         return driver
